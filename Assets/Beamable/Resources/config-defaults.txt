@@ -1,0 +1,8 @@
+{
+    "cid": "1418422019508446",
+    "alias": "samuelhegner",
+    "pid": "DE_1418422019508449",
+    "platform": "",
+    "socket": "",
+    "containerPrefix": ""
+}
