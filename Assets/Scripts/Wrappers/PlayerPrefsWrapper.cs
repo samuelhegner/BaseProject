@@ -1,29 +1,51 @@
 ﻿using System;
+using Helpers;
 using UnityEngine;
 
-namespace Helpers.PlayerPrefs
+namespace Wrappers
 {
     public static class PlayerPrefsWrapper
     {
-        public static void SaveObject<TType>(TType saveObject)
+        public static void SaveObject<TType>(TType saveObject, bool encrypt = false)
         {
             var key = typeof(TType).Name;
+            var value = Serialize(saveObject);
+
+            if (encrypt)
+            {
+                value = EncryptionHelper.EncryptText(key, value);
+            }
             
-            UnityEngine.PlayerPrefs.SetString(key, Serialize(saveObject));
-            UnityEngine.PlayerPrefs.Save();
+            SaveString(key, value);
         }
 
-        public static TType LoadObject<TType>()
+        public static TType LoadObject<TType>(bool isEncrypted = false)
         {
             var key = typeof(TType).Name;
-            var value = UnityEngine.PlayerPrefs.GetString(key, null);
+            var value = LoadString(key);
 
             if (value == null)
             {
                 return default;
             }
             
+            if (isEncrypted)
+            {
+                value = EncryptionHelper.DecryptText(key, value);
+            }
+            
             return Deserialize<TType>(value);
+        }
+
+        private static void SaveString(string key, string value)
+        {
+            PlayerPrefs.SetString(key, value);
+            PlayerPrefs.Save();
+        }
+        
+        private static string LoadString(string key)
+        { 
+            return PlayerPrefs.GetString(key, null);
         }
 
         private static string Serialize<TType>(TType saveObject)
